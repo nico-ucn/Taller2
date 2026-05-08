@@ -67,15 +67,13 @@ public class Pokemon {
 		return estado;
 	}
 	
-	public void  setEstado(String estado) {
-		this.estado = estado;
+	public void  setEstado(String nuevoEstado) {
+		this.estado = nuevoEstado;
 	}
 	
-	public void sumarStats() {
-	
+	public int sumaStats() {
+	return this.vida + this.ataque + this.defensa + this.ataqueEspecial + this.defensaEspecial + this.velocidad;
 	}
 	 
 	
 	
-	
-}
