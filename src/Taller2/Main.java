@@ -126,16 +126,149 @@ public class Main {
             }
 
             switch (opcion) {
-                case 1:
-                	System.out.println("");
-                    System.out.println("--- REVISANDO EQUIPO ---");
-                    // opción 1
-                    break;
-                case 2:
-                	System.err.println("");
-                    System.out.println("--- SALIENDO A CAPTURAR ---");
-                    // opción 2
-                    break;
+            case 1:
+            	System.out.println("");
+                System.out.println("--- REVISANDO EQUIPO ---");
+                System.out.println("Equipo Actual:");
+                
+               
+                Pokemon[] miEquipo = jugadorActual.getEquipo();
+                boolean tienePokemons = false; 
+                
+                for (int i = 0; i < miEquipo.length; i++) {
+                    
+                    
+                    if (miEquipo[i] != null) {
+                        tienePokemons = true;
+                        Pokemon p = miEquipo[i];
+                        
+                        
+                        System.out.println((i + 1) + ") " + p.getNombre() + "|" +  p.getTipo() + "|Stats totales: " + p.sumaStats());
+                    }
+                }
+                
+                
+                if (tienePokemons==false) {
+                    System.out.println("Tu equipo está vacío.");
+                }
+                break;
+                
+            case 2:
+            	
+            	System.out.println("");
+                System.out.println("Donde deseas ir a explorar?");
+                System.out.println("Zonas disponibles:");
+                
+                
+                for (int i = 0; i < habitatsGlobales.size(); i++) {
+                    System.out.println((i + 1) + ") " + habitatsGlobales.get(i));
+                }
+                int opcionVolver = habitatsGlobales.size() + 1;
+                System.out.println(opcionVolver + ") Volver al menu.");
+                
+                System.out.println("");
+                System.out.print("Ingrese Zona: ");
+                int opcionZona = Integer.parseInt(teclado.nextLine());
+
+                
+                if (opcionZona == opcionVolver) {
+                    break; 
+                }
+
+                
+                if (opcionZona > 0 && opcionZona <= habitatsGlobales.size()) {
+                    
+                    String zonaElegida = habitatsGlobales.get(opcionZona - 1);
+                    
+                    
+                    ArrayList<Pokemon> pokemonsEnZona = new ArrayList<>();
+                    double sumaProbabilidades = 0.0; 
+                    
+                    for (Pokemon p : pokedexGlobal) {
+                        if (p.getHabitat().equals(zonaElegida)) {
+                            pokemonsEnZona.add(p);
+                            sumaProbabilidades += p.getPorcentajeAparicion();
+                        }
+                    }
+
+                    
+                    double numeroAleatorio = Math.random() * sumaProbabilidades;
+                    double acumulador = 0.0;
+                    Pokemon pokemonSalvaje = null;
+                    
+                    for (Pokemon p : pokemonsEnZona) {
+                        acumulador += p.getPorcentajeAparicion();
+                        if (numeroAleatorio <= acumulador) {
+                            pokemonSalvaje = p;
+                            break; 
+                        }
+                    }
+
+                    System.out.println("");
+                    System.out.println("Oh!! Ha aparecido un increible " + pokemonSalvaje.getNombre() + "!!");
+                    System.out.println("Que deseas hacer?");
+                    System.out.println("1) Capturar");
+                    System.out.println("2) Huir");
+                    System.out.print("Ingrese Opcion: ");
+                    
+                    int accion = Integer.parseInt(teclado.nextLine());
+                    
+                    if (accion == 1) {
+
+                        boolean yaLoTiene = false;
+                        
+                        
+                        for (Pokemon p : jugadorActual.getEquipo()) {
+                            if (p != null && p.getNombre().equals(pokemonSalvaje.getNombre())) {
+                                yaLoTiene = true;
+                            }
+                        }
+                        
+                        for (Pokemon p : jugadorActual.getPc()) {
+                            if (p.getNombre().equals(pokemonSalvaje.getNombre())) {
+                                yaLoTiene = true;
+                            }
+                        }
+
+                        if (yaLoTiene) {
+                            System.out.println("No puedes capturar a " + pokemonSalvaje.getNombre() + " porque ya lo tienes en tu equipo o PC. ¡Ha huido!");
+                        } else {
+
+                        	System.out.println("");
+                            System.out.println(pokemonSalvaje.getNombre() + " capturado con exito!!");
+                            
+                            
+                            Pokemon nuevoCapturado = buscadorStats(pokemonSalvaje.getNombre(), "Vivo");
+                            
+                            boolean guardadoEnEquipo = false;
+                            Pokemon[] equipoActual = jugadorActual.getEquipo();
+                            
+                            
+                            for (int i = 0; i < equipoActual.length; i++) {
+                                if (equipoActual[i] == null) {
+                                    equipoActual[i] = nuevoCapturado;
+                                    guardadoEnEquipo = true;
+                                    System.out.println(nuevoCapturado.getNombre() + " ha sido agregado a tu equipo!");
+                                    break;
+                                }
+                            }
+                            
+                            
+                            if (!guardadoEnEquipo) {
+                                jugadorActual.getPc().add(nuevoCapturado);
+                                System.out.println("Tu equipo está lleno. " + nuevoCapturado.getNombre() + " fue enviado al PC.");
+                            }
+                        }
+                        
+                    } else {
+                        
+                        System.out.println("Has huido del combate con éxito.");
+                    }
+                } else {
+                    System.out.println("Error: Número de zona inválido.");
+                }
+                break;
+                
                 case 3:
                 	System.out.println("");
                     System.out.println("--- ACCESO AL PC ---");
@@ -354,4 +487,5 @@ public class Main {
 	
 	
 }
+
 
