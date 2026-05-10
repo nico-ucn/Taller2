@@ -27,7 +27,7 @@ public class Jugador {
 	public Pokemon[] getEquipo() {
 		return this.equipo;
 	}
-	public ArrayList getPc() {
+	public ArrayList<Pokemon> getPc() {
 		return this.pc;
 	}
 	
