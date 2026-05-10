@@ -4,7 +4,7 @@ package Taller2;
 
 import java.util.Scanner;
 
-import eo.Jugador;
+
 
 import java.io.FileNotFoundException;
 import java.io.File;
