@@ -5,7 +5,6 @@ package Taller2;
 import java.util.Scanner;
 
 
-
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.util.ArrayList;
@@ -254,7 +253,7 @@ public class Main {
                             }
                             
                             
-                            if (!guardadoEnEquipo) {
+                            if (guardadoEnEquipo == false) {
                                 jugadorActual.getPc().add(nuevoCapturado);
                                 System.out.println("Tu equipo está lleno. " + nuevoCapturado.getNombre() + " fue enviado al PC.");
                             }
@@ -269,16 +268,142 @@ public class Main {
                 }
                 break;
                 
-                case 3:
+            case 3:
+            	
+            	System.out.println("");
+                System.out.println("--- ACCESO AL PC ---");
+                ArrayList<Pokemon> pcDelJugador = jugadorActual.getPc();
+
+                
+                if (pcDelJugador.isEmpty()) {
+                    System.out.println("Tu PC está vacío. ¡Sal a explorar para capturar más Pokémon!");
+                    break; 
+                }
+
+                
+                System.out.println("Pokémon almacenados en tu PC:");
+                for (int i = 0; i < pcDelJugador.size(); i++) {
+                    Pokemon p = pcDelJugador.get(i);
+                    System.out.println((i + 1) + ") " + p.getNombre() + " | Tipo: " + p.getTipo());
+                }
+
+                System.out.println("");
+                System.out.println("¿Qué deseas hacer?");
+                System.out.println("1) Cambiar Pokémon.");
+                System.out.println("2) Salir.");
+                System.out.print("Ingrese Opcion: ");
+
+                int opcionPc = Integer.parseInt(teclado.nextLine());
+
+                if (opcionPc == 1) {
+                    
                 	System.out.println("");
-                    System.out.println("--- ACCESO AL PC ---");
-                    // opción 3
-                    break;
-                case 4:
-                	System.out.println("");
-                	System.out.println("--- RETAR GIMNASIO ---");
-                    // opción 4
-                    break;
+                    System.out.println("Equipo Actual:");
+                    Pokemon[] equipoActual = jugadorActual.getEquipo();
+                    for (int i = 0; i < equipoActual.length; i++) {
+                        if (equipoActual[i] != null) {
+                            System.out.println((i + 1) + ") " + equipoActual[i].getNombre());
+                        } else {
+                            System.out.println((i + 1) + ") [Espacio Vacío]");
+                        }
+                    }
+
+                    System.out.println("");
+                    System.out.print("Elige el número del Pokémon en tu EQUIPO que deseas enviar al PC (1-6): ");
+                    int numEquipo = Integer.parseInt(teclado.nextLine()) - 1; 
+
+                    System.out.print("Elige el número del Pokémon en el PC que deseas traer a tu equipo (1-" + pcDelJugador.size() + "): ");
+                    int numPc = Integer.parseInt(teclado.nextLine()) - 1; 
+
+                   
+                    if (numEquipo >= 0 && numEquipo < 6 && numPc >= 0 && numPc < pcDelJugador.size()) {
+                        
+                        
+                        Pokemon temp = equipoActual[numEquipo];
+                        Pokemon seleccionadoPc = pcDelJugador.get(numPc); 
+
+                        
+                        equipoActual[numEquipo] = seleccionadoPc;
+
+                        
+                        if (temp != null) {
+                            pcDelJugador.set(numPc, temp); 
+                            System.out.println("¡Cambio exitoso! " + seleccionadoPc.getNombre() + " entró al equipo por " + temp.getNombre() + ".");
+                        } else {
+                           
+                            pcDelJugador.remove(numPc);
+                            System.out.println("¡" + seleccionadoPc.getNombre() + " ha sido añadido a un espacio vacío de tu equipo!");
+                        }
+                        
+                    } else {
+                        System.out.println("Error: Números ingresados fuera de rango.");
+                    }
+                } else {
+                    System.out.println("Saliendo del PC...");
+                }
+                break;
+            case 4:
+           	 System.out.println("");
+           	 System.out.println("A cual Lider deseas retar??");
+           	 System.out.println("");
+
+               
+               for (int i = 0; i < gimnasiosGlobales.size(); i++) {
+                   Gimnasio g = gimnasiosGlobales.get(i);
+                   System.out.println((i + 1) + ") " + g.getNombre() + " - Estado: " + g.getEstado());
+               }
+               int opcionVolverGym = gimnasiosGlobales.size() + 1;
+               System.out.println(opcionVolverGym + ") Volver al menu.");
+
+               System.out.println("");
+               System.out.print("Ingrese Opcion: ");
+               int opcionGym = Integer.parseInt(teclado.nextLine());
+
+               if (opcionGym == opcionVolverGym) {
+                   break;
+               }
+
+              
+               if (opcionGym > 0 && opcionGym <= gimnasiosGlobales.size()) {
+                   
+                   Gimnasio gymElegido = gimnasiosGlobales.get(opcionGym - 1);
+
+                  
+                   if (jugadorActual.getMedallas() < (opcionGym - 1)) {
+                   	System.out.println("");
+                       System.out.println("Calmado Entrenador!!! No puedes retar a " + gymElegido.getNombre() + " sin haber derrotado a los lideres anteriores!!");
+                   } 
+                   else if (gymElegido.getEstado().equals("Derrotado")) {
+                   	System.out.println("");
+                       System.out.println("¡Ya has derrotado a " + gymElegido.getNombre() + "! Busca un nuevo desafío.");
+                   } 
+                   else {
+                      
+                       boolean puedePelear = false;
+                       for (Pokemon p : jugadorActual.getEquipo()) {
+                           
+                           if (p != null && p.getEstado().equals("Vivo")) {
+                               puedePelear = true;
+                               break; 
+                           }
+                       }
+
+                       if (puedePelear) {
+                       	System.out.println("");
+                           System.out.println("Desafiando a " + gymElegido.getNombre() + "!!");
+                           
+                           
+                           iniciarBatallaGimnasio(gymElegido); 
+                           
+                       } else {
+                       	System.out.println("");
+                           System.out.println("¡Tu equipo no tiene pokemons en condiciones de pelear! Ve a curarlos a la opción 6.");
+                       }
+                   }
+               } else {
+                   System.out.println("Error: Opción de gimnasio inválida.");
+               }
+               break;
                 case 5:
                 	System.out.println("");
                     System.out.println("--- ALTO MANDO ---");
@@ -311,6 +436,190 @@ public class Main {
     }
 	
 
+	public static void iniciarBatallaGimnasio(Gimnasio liderRival) {
+        Scanner teclado = new Scanner(System.in);
+        boolean enBatalla = true;
+        
+        
+        Pokemon miPoke = null;
+        for (Pokemon p : jugadorActual.getEquipo()) {
+            if (p != null && p.getEstado().equals("Vivo")) {
+                miPoke = p;
+                break; 
+            }
+        }
+
+        Pokemon[] equipoRival = liderRival.getEquipo(); 
+        int indiceRival = 0;
+        Pokemon rivalPoke = equipoRival[indiceRival];
+        System.out.println("");
+        System.out.println(liderRival.getNombre() + " saca a " + rivalPoke.getNombre() + "!");
+        System.out.println(jugadorActual.getnombreJugador() + " saca a " + miPoke.getNombre() + "!");
+
+        
+        
+        while (enBatalla == true) {
+            
+            
+            if (miPoke == null || miPoke.getEstado().equals("Debilitado")) {
+                boolean tieneVivos = false;
+                for (Pokemon p : jugadorActual.getEquipo()) {
+                    if (p != null && p.getEstado().equals("Vivo")) {
+                        tieneVivos = true;
+                    }
+                }
+
+                if (tieneVivos == false) {
+                	System.out.println("");
+                    System.out.println("Te has quedado sin pokemons en tu equipo!");
+                    System.out.println("Volviendo al menu...");
+                    enBatalla = false;
+                    break;
+                } else {
+                	System.out.println("");
+                    System.out.println("¡Tu Pokémon anterior fue derrotado! Tienes que elegir otro.");
+                   
+                    miPoke = cambiarPokemonEnBatalla();
+                    System.out.println(jugadorActual.getnombreJugador() + " saca a " + miPoke.getNombre() + "!");
+                }
+            }
+            System.out.println("");
+            System.out.println("Que deseas hacer?");
+            System.out.println("1) Atacar");
+            System.out.println("2) Cambiar de pokemon");
+            System.out.println("3) Rendirse");
+            System.out.print("Ingrese Opcion: ");
+            
+            int opcionBatalla = Integer.parseInt(teclado.nextLine());
+
+            switch (opcionBatalla) {
+                case 1:
+                    
+                    double misStats = miPoke.sumaStats();
+                    double rivalStats = rivalPoke.sumaStats();
+                    
+                    System.out.println("");
+                    System.out.println( miPoke.getNombre() + " -> " + misStats + " puntos");
+                    System.out.println(rivalPoke.getNombre() + " -> " + rivalStats + " puntos");
+
+                    
+                    
+                    double miMult = TablaTipos.obtenerMultiplicador(miPoke.getTipo(), rivalPoke.getTipo());
+                    double rivalMult = TablaTipos.obtenerMultiplicador(rivalPoke.getTipo(), miPoke.getTipo());
+
+                    
+                    
+                    if (miMult == 2.0) {
+                        System.out.println("");
+                        System.out.println(miPoke.getNombre() + " es muy efectivo contra " + rivalPoke.getNombre() + "!");
+                    } else if (miMult == 0.5) {
+                        System.out.println("");
+                        System.out.println(miPoke.getNombre() + " no es efectivo contra " + rivalPoke.getNombre() + "!");
+                    }
+
+                    if (rivalMult == 2.0) {
+                        System.out.println("");
+                        System.out.println(rivalPoke.getNombre() + " es muy efectivo contra " + miPoke.getNombre() + "!");
+                    } else if (rivalMult == 0.5) {
+                        System.out.println("");
+                        System.out.println(rivalPoke.getNombre() + " no es efectivo contra " + miPoke.getNombre() + "!");
+                    }
+
+
+                    
+                    double misStatsFinales = misStats * miMult;
+                    double rivalStatsFinales = rivalStats * rivalMult;
+
+                    
+                    
+                    System.out.println("");
+                    System.out.println("Nuevo puntaje:");
+                    System.out.println(miPoke.getNombre() + " -> " + misStatsFinales + " puntos");
+                    System.out.println(rivalPoke.getNombre() + " -> " + rivalStatsFinales + " puntos");
+
+                    
+                    if (misStatsFinales >= rivalStatsFinales) { 
+                    	
+                    	System.out.println("");
+                        System.out.println("Ha ganado " + miPoke.getNombre() + "! " + rivalPoke.getNombre() + " ha sido derrotado...");
+                        rivalPoke.setEstado("Debilitado");
+                        
+                        
+                        indiceRival++;
+                        if (indiceRival < liderRival.getCantPokemons()) {
+                            rivalPoke = equipoRival[indiceRival];
+                            
+                            System.out.println("");
+                            System.out.println(liderRival.getNombre() + " saca a " + rivalPoke.getNombre() + "!");
+                        } else {
+                            
+                        	System.out.println("");
+                            System.out.println("¡Has derrotado a todos los Pokémon de " + liderRival.getNombre() + "!");
+                            liderRival.setEstado("Derrotado");
+                            jugadorActual.setMedallas(jugadorActual.getMedallas() + 1);
+                            System.out.println("¡Has obtenido una nueva medalla! Medallas totales: " + jugadorActual.getMedallas());
+                            enBatalla = false;
+                        }
+
+                    } else { 
+                    	
+                    	System.out.println("");
+                        System.out.println("Ha ganado " + rivalPoke.getNombre() + "! " + miPoke.getNombre() + " ha sido derrotado...");
+                        miPoke.setEstado("Debilitado");
+                        
+                    }
+                    break;
+
+                case 2:
+                    
+                    System.out.println("Elige a quien enviar al combate:");
+                    miPoke = cambiarPokemonEnBatalla();
+                    System.out.println(jugadorActual.getnombreJugador() + " saca a " + miPoke.getNombre() + "!");
+                    break;
+
+                case 3:
+                  
+                	
+                	System.out.println("");
+                    System.out.println("Has decidido huir del combate...");
+                    System.out.println("El gimnasio permanece 'Sin derrotar'.");
+                    enBatalla = false;
+                    break;
+
+                default:
+                    System.out.println("Opción inválida.");
+            }
+        }
+    }
+
+   
+    public static Pokemon cambiarPokemonEnBatalla() {
+        Scanner teclado = new Scanner(System.in);
+        Pokemon[] miEquipo = jugadorActual.getEquipo();
+        int eleccion = -1;
+        
+        while (true) {
+            for (int i = 0; i < miEquipo.length; i++) {
+                if (miEquipo[i] != null && miEquipo[i].getEstado().equals("Vivo")) {
+                    System.out.println((i + 1) + ") " + miEquipo[i].getNombre() + " | Stats: " + miEquipo[i].sumaStats());
+                }
+            }
+            
+            System.out.print("Ingrese número de Pokémon: ");
+            eleccion = Integer.parseInt(teclado.nextLine()) - 1;
+
+            if (eleccion >= 0 && eleccion < 6 && miEquipo[eleccion] != null && miEquipo[eleccion].getEstado().equals("Vivo")) {
+                return miEquipo[eleccion];
+            } else {
+                System.out.println("¡Ese Pokémon no existe o está debilitado! Intenta de nuevo.\n");
+            }
+        }
+    }
+	
+	
+	
+	
+	
 	public static void cargarPokedex() {
 		try {
 			File archivo = new File("Pokedex.txt");
@@ -487,5 +796,3 @@ public class Main {
 	
 	
 }
-
-
